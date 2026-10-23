@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sandra Liz Simon</title>
+<meta name="description" content="Sandra Liz Simon, PhD candidate in Chemical Engineering at IIT Kanpur and Prime Minister's Research Fellow, builds active-learning methods for transition-state search and reaction path discovery.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400..700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: full-width dark-navy page; sticky nav with portrait brand; hero headline over a live NEB canvas; then highlight strip, news rail, and sections in a 1200px column. Single dark look by design. */
+:root {
+  --void: #050b1f;
+  --bg: #0a1434;
+  --panel: #12234a;
+  --panel-2: #0c1a3d;
+  --ink: #f5f7ff;
+  --muted: #c3d0ec;
+  --dim: #8fa3c9;
+  --line: rgba(159, 190, 255, 0.26);
+  --mint: #b9d8ff;
+  --cyan: #8cd7ff;
+  --ts: #ff9cc7;            /* saddle points */
+  --font-display: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Open Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --step-0: 1.0625rem;
+  --step-1: 1.3rem;
+  --step-2: clamp(1.9rem, 3.4vw, 2.6rem);
+  --step-hero: clamp(2.8rem, 7vw, 5.6rem);
+  --small: 0.95rem;
+  --label: 0.75rem;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--void); color: var(--muted);
+  font-family: var(--font-body); font-size: var(--step-0); font-weight: 500; line-height: 1.75;
+}
+::selection { background: var(--mint); color: var(--void); }
+a { color: var(--cyan); text-underline-offset: 3px; }
+a:hover { color: var(--mint); }
+:focus-visible { outline: 2px solid var(--mint); outline-offset: 4px; border-radius: 3px; }
+h1, h2, h3 { font-family: var(--font-display); color: var(--ink); line-height: 1.2; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+h3 { font-size: var(--step-1); font-weight: 600; }
+p { margin: 0; }
+.wrap { max-width: 75rem; margin: 0 auto; padding-inline: clamp(16px, 4vw, 48px); }
+.eyebrow { font-family: var(--font-mono); font-size: var(--label); font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mint); }
+
+/* nav */
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: rgba(5, 11, 31, 0.86); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; gap: 1.5rem; padding-block: 0.75rem; }
+.brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--ink); flex: none; }
+.brand img { width: 44px; height: 44px; flex: none; aspect-ratio: 1; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--mint); }
+.brand b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.2; }
+.brand small { display: block; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); line-height: 1.4; }
+.nav ul { display: flex; gap: 1.4rem; align-items: center; list-style: none; margin: 0 0 0 auto; padding: 0; overflow-x: auto; scrollbar-width: none; }
+.nav ul::-webkit-scrollbar { display: none; }
+.nav ul a { font-size: 0.85rem; font-weight: 600; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.nav ul a:hover { color: var(--mint); }
+.nav .cta { border: 1px solid var(--line); padding: 0.45rem 0.95rem; border-radius: 6px; color: var(--ink); }
+@media (max-width: 860px) { .brand small { display: none; } .nav .wrap { gap: 1rem; } }
+@media (max-width: 560px) { .brand b { display: none; } }
+
+/* hero */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line);
+  background: radial-gradient(ellipse at 78% 40%, #1b2d64 0, var(--bg) 40%, var(--void) 78%); }
+#neb { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(5,11,31,0.92) 0%, rgba(5,11,31,0.6) 45%, rgba(5,11,31,0) 75%); }
+.hero .wrap { position: relative; z-index: 2; padding-block: clamp(4rem, 10vw, 7.5rem) 2rem; }
+.hero-intro { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.75rem; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 14px var(--mint); flex: none; }
+.hero h1 { font-size: var(--step-hero); font-weight: 600; line-height: 1.03; letter-spacing: -0.05em; max-width: 13ch; }
+.hero h1 span { color: var(--mint); }
+.hero .lede { font-size: 1.15rem; line-height: 1.8; max-width: 34rem; margin-top: 1.75rem; color: var(--muted); }
+.hero .lede b { color: var(--ink); font-weight: 700; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+.btn { display: inline-flex; align-items: center; gap: 0.9rem; padding: 0.8rem 1.35rem; border: 1px solid var(--line); border-radius: 6px;
+  font-size: 0.9rem; font-weight: 700; color: var(--ink); text-decoration: none; background: rgba(18, 35, 74, 0.55); transition: transform .2s, background .2s; }
+.btn:hover { transform: translateY(-2px); background: #17274d; color: var(--ink); }
+.btn.primary { background: var(--mint); border-color: var(--mint); color: #07152e; }
+.btn.primary:hover { background: #d5e5ff; color: #07152e; }
+.hero-caption { margin-top: clamp(3rem, 8vw, 5rem); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;
+  border-top: 1px solid var(--line); padding-top: 1.1rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+.hero-caption .live { border-left: 1px solid var(--cyan); padding-left: 0.8rem; }
+#motion { background: transparent; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); font: inherit; letter-spacing: 0.08em; padding: 0.45rem 0.8rem; cursor: pointer; }
+#motion:hover { color: var(--mint); border-color: var(--mint); }
+@media (max-width: 760px) { .hero::before { background: rgba(5,11,31,0.72); } }
+
+/* highlight strip */
+.strip { background: #070e25; border-bottom: 1px solid var(--line); }
+.strip ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.strip li { display: flex; gap: 0.9rem; align-items: baseline; padding: 1.6rem 1.25rem; border-right: 1px solid var(--line); }
+.strip li:first-child { padding-left: 0; }
+.strip li:last-child { border-right: 0; }
+.strip .n { font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyan); }
+.strip b { display: block; font-family: var(--font-display); color: var(--ink); font-size: 1.05rem; font-weight: 600; line-height: 1.3; }
+.strip span.s { display: block; font-size: 0.85rem; color: var(--dim); }
+@media (max-width: 860px) {
+  .strip ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .strip li { padding: 1.25rem 1rem; border-bottom: 1px solid var(--line); }
+  .strip li:nth-child(odd) { padding-left: 0; } .strip li:nth-child(2) { border-right: 0; }
+  .strip li:nth-child(n+3) { border-bottom: 0; }
+}
+@media (max-width: 480px) { .strip ol { grid-template-columns: 1fr; } .strip li { padding-left: 0; border-right: 0; border-bottom: 1px solid var(--line); } .strip li:last-child { border-bottom: 0; } }
+
+/* sections */
+section.block { padding-block: clamp(3.5rem, 8vw, 5.5rem); }
+section.alt { background: #070e25; border-block: 1px solid var(--line); }
+.sec-title { display: grid; gap: 0.6rem; margin-bottom: 2.5rem; }
+.sec-title h2 { font-size: var(--step-2); font-weight: 600; }
+.sec-title h2::after { content: ""; display: block; width: 44px; height: 2px; background: var(--mint); margin-top: 1rem; }
+.sec-title p { max-width: 46rem; }
+
+/* news rail */
+.rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(16.5rem, 19rem); gap: 1rem; overflow-x: auto; padding-bottom: 1rem; scroll-snap-type: x proximity; scrollbar-color: var(--panel) transparent; }
+.news { scroll-snap-align: start; display: grid; gap: 0.6rem; align-content: start; padding: 1.4rem; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+.news .top { display: flex; justify-content: space-between; gap: 0.5rem; font-family: var(--font-mono); font-size: var(--label); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.news .top .k { color: var(--cyan); }
+.news .top .y { color: var(--dim); font-variant-numeric: tabular-nums; }
+.news h3 { font-size: 1.05rem; line-height: 1.4; }
+.news p { font-size: 0.9rem; line-height: 1.6; color: var(--dim); }
+
+/* about */
+.about { display: grid; grid-template-columns: minmax(0, 19rem) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+.about-photo { display: block; width: 100%; max-width: 19rem; height: auto; aspect-ratio: 1 / 1; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 6px var(--void), 0 0 0 8px var(--mint); }
+.about-text { display: grid; gap: 1.1rem; min-width: 0; }
+.about-text h3 { font-size: 1.5rem; }
+.about-text p b { color: var(--ink); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.6rem 2rem; list-style: none; padding: 1.25rem 0 0; margin: 0.5rem 0 0; border-top: 1px solid var(--line); }
+.facts li { font-size: 0.95rem; overflow-wrap: anywhere; }
+.facts li strong { color: var(--ink); margin-right: 0.4rem; }
+.facts li::before { content: "›"; color: var(--cyan); margin-right: 0.5rem; font-weight: 700; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; margin: 0; }
+.tags li { font-size: 0.85rem; font-weight: 600; padding: 0.3rem 0.8rem; border-radius: 999px; background: #142347; color: var(--mint); border: 1px solid var(--line); }
+@media (max-width: 760px) { .about { grid-template-columns: 1fr; } .about-photo { max-width: 13rem; } }
+
+/* cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1.25rem; }
+.card { display: grid; gap: 0.8rem; align-content: start; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.75rem; transition: border-color .3s, transform .3s; min-width: 0; }
+.card:hover { border-color: var(--cyan); transform: translateY(-4px); }
+.card .head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+.pill { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; padding: 0.25rem 0.6rem; border-radius: 4px; white-space: nowrap; }
+.pill.pub { background: rgba(140, 215, 255, 0.12); color: var(--cyan); border: 1px solid var(--line); }
+.pill.prep { border: 1px dashed var(--dim); color: var(--dim); }
+.card p { font-size: 0.97rem; line-height: 1.7; }
+.card .meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--dim); letter-spacing: 0.04em; }
+@media (prefers-reduced-motion: reduce) { .card, .btn { transition: none; } .card:hover, .btn:hover { transform: none; } }
+
+.awards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1.25rem; }
+.award { position: relative; padding: 1.75rem; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(160deg, var(--panel), var(--panel-2)); display: grid; gap: 0.5rem; align-content: start; }
+.award .yr { font-family: var(--font-mono); font-size: var(--label); font-weight: 600; color: var(--void); background: var(--mint); justify-self: start; padding: 0.15rem 0.55rem; border-radius: 4px; }
+.award h3 { font-size: 1.15rem; }
+.award p { font-size: 0.92rem; color: var(--dim); }
+
+/* timeline */
+.tl-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 2.5rem 3rem; }
+.tl-cols > div > h3 { font-size: 1.4rem; margin-bottom: 1.75rem; }
+.tl { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--line); }
+.tl li { position: relative; padding: 0 0 2rem 1.6rem; }
+.tl li:last-child { padding-bottom: 0; }
+.tl li::before { content: ""; position: absolute; left: -7px; top: 0.45rem; width: 12px; height: 12px; border-radius: 50%; background: var(--void); border: 2px solid var(--mint); }
+.tl h4 { margin: 0; font-family: var(--font-display); color: var(--ink); font-size: 1.05rem; font-weight: 600; line-height: 1.45; }
+.tl .when { display: inline-block; margin: 0.45rem 0; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; color: var(--cyan); background: rgba(112, 215, 228, 0.08); border: 1px solid var(--line); border-radius: 4px; padding: 0.15rem 0.55rem; }
+.tl p { font-size: 0.93rem; line-height: 1.65; }
+.tl em { font-style: normal; color: var(--dim); }
+
+/* publications */
+.pubs { list-style: none; margin: 0; padding: 0; counter-reset: pub; }
+.pubs li { counter-increment: pub; display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); padding-block: 1.5rem; border-bottom: 1px solid var(--line); }
+.pubs li:first-child { padding-top: 0; }
+.pubs li::before { content: counter(pub, decimal-leading-zero); font-family: var(--font-mono); font-size: 0.85rem; color: var(--cyan); padding-top: 0.2rem; }
+.pubs .t { font-family: var(--font-display); color: var(--ink); font-weight: 600; font-size: 1.2rem; line-height: 1.4; }
+.pubs .a { margin-top: 0.35rem; font-size: 0.95rem; }
+.pubs .a b { color: var(--ink); }
+.pubs .j { font-size: 0.95rem; color: var(--dim); }
+.pubs .j i { color: var(--muted); }
+.pubs .doi { font-family: var(--font-mono); font-size: 0.78rem; overflow-wrap: anywhere; }
+.note { margin-top: 1.25rem; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.06em; color: var(--dim); text-transform: uppercase; }
+
+/* talks */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th { text-align: left; font-family: var(--font-mono); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); padding: 1rem 1.25rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-family: var(--font-mono); color: var(--cyan); font-variant-numeric: tabular-nums; }
+td.loc { color: var(--dim); white-space: nowrap; }
+.prize { display: inline-block; margin-left: 0.5rem; font-family: var(--font-mono); font-size: 0.68rem; color: var(--void); background: var(--mint); border-radius: 3px; padding: 0 0.4rem; vertical-align: 2px; }
+
+/* skills */
+.skillgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1.25rem; }
+.skillgrid h3 { font-size: 1.05rem; margin-bottom: 0.9rem; }
+
+/* contact */
+.contact { display: block; background: linear-gradient(135deg, var(--panel), var(--panel-2)); border: 1px solid var(--line); border-radius: 18px; padding: clamp(1.5rem, 4vw, 3rem); }
+.contact h2 { font-size: var(--step-2); font-weight: 600; }
+.contact .lead { margin-top: 0.8rem; max-width: 36rem; }
+.cgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1.5rem 2rem; margin-top: 2rem; }
+.cgrid .item { display: grid; gap: 0.35rem; align-content: start; min-width: 0; }
+.copyline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.copyline code { font-family: var(--font-mono); font-size: 0.88rem; color: var(--ink); user-select: all; overflow-wrap: anywhere; }
+.copy { font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--muted); cursor: pointer; font-family: var(--font-body); }
+.copy:hover { color: var(--mint); border-color: var(--mint); }
+
+footer { border-top: 1px solid var(--line); background: #040919; padding-block: 2rem; font-size: 0.88rem; color: var(--dim); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
+footer nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+footer a { color: var(--muted); text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <img src="portrait.png" alt="" width="44" height="44">
+      <span><b>Sandra Liz Simon</b><small>Computational catalysis · ML</small></span>
+    </a>
+    <ul>
+      <li><a href="#news">News</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#talks">Talks</a></li>
+      <li><a class="cta" href="#contact">Let's connect ↗</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="hero-title">
+    <canvas id="neb" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="hero-intro"><span class="dot"></span><span class="eyebrow">Computational catalysis · Machine learning</span></div>
+      <h1 id="hero-title">Finding transition states, <span>faster.</span></h1>
+      <p class="lede">I'm <b>Sandra Liz Simon</b>, a PhD candidate and Prime Minister's Research Fellow at IIT Kanpur. I build active-learning algorithms that discover reaction pathways and transition states with an order of magnitude fewer DFT calculations.</p>
+      <div class="actions">
+        <a class="btn primary" href="#research">Explore my research ↗</a>
+        <a class="btn" href="#contact">Get in touch →</a>
+      </div>
+      <div class="hero-caption">
+        <span class="live">Live · nudged elastic band, from linear guess to MEP, on the Müller–Brown surface</span>
+        <span>IIT Kanpur, India · 26.51° N · 80.23° E</span>
+        <button id="motion" type="button" aria-pressed="false">Pause animation</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="strip">
+    <div class="wrap">
+      <ol>
+        <li><span class="n">01</span><span><b>Prime Minister's Research Fellow</b><span class="s">Government of India</span></span></li>
+        <li><span class="n">02</span><span><b>10× fewer DFT calls</b><span class="s">AL-NEB, JCTC 2026</span></span></li>
+        <li><span class="n">03</span><span><b>Conference presentations</b><span class="s">Including AIChE, ACS, NAM</span></span></li>
+        <li><span class="n">04</span><span><b>Gold Medalist</b><span class="s">B.Tech, NIT Calicut</span></span></li>
+      </ol>
+    </div>
+  </div>
+
+  <section class="block" id="news">
+    <div class="wrap">
+      <div class="sec-title">
+        <span class="eyebrow">Papers · Conferences · Teaching</span>
+        <h2>Latest news</h2>
+      </div>
+      <div class="rail" tabindex="0" aria-label="News, scroll sideways for more">
+        <article class="news"><div class="top"><span class="k">PhD milestone</span><span class="y">Aug 14, 2026</span></div><h3>Delivered my PhD open seminar at IIT Kanpur</h3><p>Presented my doctoral research, <i>“Developing Novel Algorithms for Exploring Potential Energy Surfaces.”</i></p></article>
+        <article class="news"><div class="top"><span class="k">Publication</span><span class="y">2026</span></div><h3>AL-NEB published in the Journal of Chemical Theory and Computation</h3><p>An active-learning algorithm for identifying transition states on a potential energy surface.</p><a href="https://doi.org/10.1021/acs.jctc.5c01811" rel="noopener">Read the paper ↗</a></article>
+        <article class="news"><div class="top"><span class="k">Teaching</span><span class="y">2026</span></div><h3>Fourth year with NPTEL MATLAB Programming for Numerical Computation</h3><p>Weekly sessions on numerical methods, delivered on NPTEL, India's national online course platform.</p></article>
+        <article class="news"><div class="top"><span class="k">Publication</span><span class="y">2025</span></div><h3>Accelerated relaxation engines in Reaction Chemistry &amp; Engineering</h3><p>AARE and Acc-CG optimizers for minimum energy path calculations.</p><a href="https://doi.org/10.1039/D5RE00180C" rel="noopener">Read the paper ↗</a></article>
+        <article class="news"><div class="top"><span class="k">Conference</span><span class="y">2025</span></div><h3>Presented at the 29th North American Catalysis Society Meeting</h3><p>NAM 2025 · Atlanta, Georgia, USA</p></article>
+        <article class="news"><div class="top"><span class="k">Conference</span><span class="y">2025</span></div><h3>Sci-Mix poster at ACS Spring 2025</h3><p>San Diego, California, USA</p></article>
+        <article class="news"><div class="top"><span class="k">Conference</span><span class="y">2025</span></div><h3>Recent Advances in Modeling Rare Events (RARE 2025)</h3><p>Khajuraho, India</p></article>
+        <article class="news"><div class="top"><span class="k">Conference</span><span class="y">2024</span></div><h3>Presented at the AIChE Annual Meeting 2024</h3><p>San Diego, California, USA</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" id="about">
+    <div class="wrap about">
+      <img class="about-photo" src="portrait.png" alt="Portrait of Sandra Liz Simon" width="560" height="560">
+      <div class="about-text">
+        <span class="eyebrow">About</span>
+        <p>I am a doctoral researcher in the <b>Computational Catalysis and Interfacial Chemistry Laboratory</b> at IIT Kanpur, advised by Prof. Vishal Agarwal and Prof. Nitin Kaistha. I joined the Direct-PhD program in 2021 after graduating as gold medalist in Chemical Engineering from NIT Calicut.</p>
+        <p>My work merges computational chemistry and machine learning. Locating the transition state of a reaction on a DFT potential energy surface can take hundreds of expensive force evaluations. I develop <b>Gaussian-process-based active-learning methods</b> that learn the surface as the reaction path evolves and spend DFT calls only at the most informative locations on the potential energy surface. The goal is faster, cheaper screening of catalysts for industrially important reactions.</p>
+        <ul class="tags" aria-label="Research interests">
+          <li>Computational catalysis</li><li>ML for chemistry</li><li>Active learning</li><li>Bayesian optimization</li><li>Transition-state search</li><li>Uncertainty quantification</li>
+        </ul>
+        <ul class="facts">
+          <li><strong>Institute:</strong>IIT Kanpur, India</li>
+          <li><strong>Degree:</strong>Ph.D., Chemical Engineering</li>
+          <li><strong>Fellowship:</strong>Prime Minister's Research Fellow</li>
+          <li><strong>Email:</strong>sandralizsimon@gmail.com</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="research">
+    <div class="wrap">
+      <div class="sec-title">
+        <span class="eyebrow">Research</span>
+        <h2>Reaction path discovery on potential energy surfaces</h2>
+        <p>The minimum energy path is the lowest-energy route between two stable states, and its highest point, the saddle point, sets the reaction rate in harmonic transition state theory. Methods like the nudged elastic band find this path reliably, but each iteration needs DFT forces at many images. My methods cut that cost so harder, larger reactions become practical to study.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="head"><h3>AL-NEB</h3><span class="pill pub">JCTC 2026</span></div>
+          <p>An active-learning framework that couples joint energy–gradient Gaussian process regression with the nudged elastic band for automated transition-state discovery. Cuts DFT force evaluations by more than an order of magnitude at the same accuracy, validated on gas-phase reactions and surface diffusion with up to 525 degrees of freedom.</p>
+          <span class="meta">GPyTorch · ASE · VASP · Gaussian16 · MATLAB</span>
+        </article>
+        <article class="card">
+          <div class="head"><h3>AARE and Acc-CG</h3><span class="pill pub">React. Chem. Eng. 2025</span></div>
+          <p>Two optimizers for structures and minimum energy paths: AARE (Adaptively Accelerated Relaxation Engine), a molecular-dynamics-based optimizer with adaptive acceleration, and Acc-CG, an accelerated conjugate gradient method. Both work as drop-in optimizers in ASE.</p>
+          <span class="meta">ASE · Python</span>
+        </article>
+        <article class="card">
+          <div class="head"><h3>Multi-fidelity active learning</h3><span class="pill prep">In preparation</span></div>
+          <p>Combines cheap low-fidelity and expensive high-fidelity simulation data through co-kriging to locate transition states at high-fidelity accuracy with far fewer DFT evaluations. Manuscript and software release in preparation.</p>
+          <span class="meta">Co-kriging · ASE · VASP · Gaussian16</span>
+        </article>
+        <article class="card">
+          <div class="head"><h3>Moving-Anchor AL-NEB</h3><span class="pill prep">In preparation</span></div>
+          <p>Robust transition-state identification and lower-cost path exploration, validated on the Baker test set and on CH₄ decomposition over ZnCl₂, H₂ dissociation on Au(111), keto–enol tautomerization in a zeolite cluster, and methane pyrolysis over molten sodium.</p>
+          <span class="meta">Catalysis applications · DFT</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" id="publications">
+    <div class="wrap">
+      <div class="sec-title">
+        <span class="eyebrow">Publications</span>
+        <h2>Peer-reviewed papers</h2>
+      </div>
+      <ol class="pubs">
+        <li><div>
+          <div class="t">An Active Learning Algorithm for Identifying Transition States on a Potential Energy Surface</div>
+          <div class="a"><b>Sandra Liz Simon</b>, Nitin Kaistha, Vishal Agarwal</div>
+          <div class="j"><i>Journal of Chemical Theory and Computation</i>, 2026, 22, 2972–2986</div>
+          <a class="doi" href="https://doi.org/10.1021/acs.jctc.5c01811" rel="noopener">doi:10.1021/acs.jctc.5c01811 ↗</a>
+        </div></li>
+        <li><div>
+          <div class="t">Accelerated Relaxation Engines for Optimizing to a Minimum Energy Path</div>
+          <div class="a"><b>Sandra Liz Simon</b>, Nitin Kaistha, Vishal Agarwal</div>
+          <div class="j"><i>Reaction Chemistry &amp; Engineering</i>, 2025, 10, 2285</div>
+          <a class="doi" href="https://doi.org/10.1039/D5RE00180C" rel="noopener">doi:10.1039/D5RE00180C ↗</a>
+        </div></li>
+      </ol>
+      <p class="note">Two more manuscripts with software releases in preparation</p>
+    </div>
+  </section>
+
+  <section class="block" id="awards">
+    <div class="wrap">
+      <div class="sec-title">
+        <span class="eyebrow">Recognition</span>
+        <h2>Awards &amp; honors</h2>
+      </div>
+      <div class="awards">
+        <div class="award"><span class="yr">2021 – present</span><h3>Prime Minister's Research Fellowship</h3><p>Government of India's flagship doctoral fellowship.</p></div>
+        <div class="award"><span class="yr">2023</span><h3>Third Prize, Oral Presentation</h3><p>ChEmference 2023, BITS Pilani Goa.</p></div>
+        <div class="award"><span class="yr">2021</span><h3>Gold Medal, B.Tech</h3><p>Chemical Engineering, NIT Calicut · GPA 9.25.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" id="experience">
+    <div class="wrap">
+      <div class="sec-title">
+        <span class="eyebrow">Experience</span>
+        <h2>Education &amp; teaching</h2>
+      </div>
+      <div class="tl-cols">
+        <div>
+          <h3>Education</h3>
+          <ol class="tl">
+            <li><h4>Ph.D., Chemical Engineering</h4><span class="when">2021 – present</span><p>Indian Institute of Technology Kanpur · GPA 8.89<br><em>Thesis: “Developing Novel Algorithms for Exploring Potential Energy Surfaces”</em></p></li>
+            <li><h4>B.Tech, Chemical Engineering</h4><span class="when">2017 – 2021</span><p>National Institute of Technology Calicut · GPA 9.25 · Gold Medalist<br><em>Projects: PEM fuel cell design and control (Aspen), multiphase CFD in a stirred tank (ANSYS Fluent), CSTR dynamics and finite-volume diffusion solvers (MATLAB)</em></p></li>
+          </ol>
+        </div>
+        <div>
+          <h3>Teaching</h3>
+          <ol class="tl">
+            <li><h4>MATLAB Programming for Numerical Computation · NPTEL</h4><span class="when">Jan–Apr, 2023–2026</span><p>Weekly sessions on linear and nonlinear systems, ODEs and PDEs, optimization, error analysis and convergence.</p></li>
+            <li><h4>MATLAB-Based Programming Lab in Chemical Engineering · NPTEL</h4><span class="when">Jul–Oct 2025</span><p>Modeling CSTRs, distillation, heat transfer, fluid flow and reaction–diffusion systems.</p></li>
+            <li><h4>Mechanical Unit Operations · NPTEL</h4><span class="when">Jul–Oct, 2023–2024</span><p>Particle size analysis, filtration, fluidization, sedimentation and separation.</p></li>
+            <li><h4>MATLAB Workshop · CSJM University, Kanpur</h4><span class="when">Mar–Apr 2023</span><p>Hands-on programming sessions for undergraduates.</p></li>
+            <li><h4>Teaching Assistant · IIT Kanpur</h4><span class="when">2021 – 2022</span><p>Chemical Reaction Engineering (MATLAB coding workshops) and Thermodynamics.</p></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="talks">
+    <div class="wrap">
+      <div class="sec-title">
+        <span class="eyebrow">Talks &amp; posters</span>
+        <h2>Conference presentations</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Year</th><th scope="col">Conference</th><th scope="col">Location</th></tr></thead>
+          <tbody>
+            <tr><td>2025</td><td>29th North American Catalysis Society Meeting (NAM 2025)</td><td class="loc">Atlanta, GA, USA</td></tr>
+            <tr><td>2025</td><td>ACS Spring 2025, Sci-Mix</td><td class="loc">San Diego, CA, USA</td></tr>
+            <tr><td>2025</td><td>Recent Advances in Modeling Rare Events (RARE 2025)</td><td class="loc">Khajuraho, India</td></tr>
+            <tr><td>2024</td><td>AIChE Annual Meeting 2024</td><td class="loc">San Diego, CA, USA</td></tr>
+            <tr><td>2024</td><td>Research Scholars' Day</td><td class="loc">IIT Kanpur</td></tr>
+            <tr><td>2023</td><td>Theoretical Chemistry Symposium (TCS)</td><td class="loc">IIT Madras</td></tr>
+            <tr><td>2023</td><td>ChEmference 2023<span class="prize">3rd prize</span></td><td class="loc">BITS Pilani Goa</td></tr>
+            <tr><td>2023</td><td>Institute Research Symposium</td><td class="loc">IIT Kanpur</td></tr>
+            <tr><td>2022</td><td>International Conference ChemTSF 2022</td><td class="loc">IIT Roorkee</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" id="skills">
+    <div class="wrap">
+      <div class="sec-title">
+        <span class="eyebrow">Toolkit</span>
+        <h2>Skills</h2>
+      </div>
+      <div class="skillgrid">
+        <div><h3>Machine learning</h3><ul class="tags"><li>Gaussian processes</li><li>Co-kriging</li><li>Bayesian optimization</li><li>Active learning</li><li>Surrogate modeling</li><li>Uncertainty quantification</li></ul></div>
+        <div><h3>Computational chemistry</h3><ul class="tags"><li>DFT</li><li>NEB</li><li>Transition-state search</li><li>VASP</li><li>Gaussian16</li></ul></div>
+        <div><h3>Scientific computing</h3><ul class="tags"><li>Python</li><li>PyTorch</li><li>GPyTorch</li><li>ASE</li><li>NumPy / SciPy</li><li>MATLAB</li><li>SLURM / PBS</li><li>Bash · Git · Linux</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="contact">
+    <div class="wrap">
+      <div class="contact">
+        <div>
+          <span class="eyebrow">Contact</span>
+          <h2>Let's connect</h2>
+          <p class="lead">I'm glad to talk about transition-state methods, machine learning for catalysis, collaborations and postdoctoral opportunities.</p>
+          <div class="cgrid">
+            <div class="item">
+              <span class="eyebrow">Email</span>
+              <div class="copyline"><code>sandralizsimon@gmail.com</code><button class="copy" type="button" data-copy="sandralizsimon@gmail.com">Copy</button></div>
+              <div class="copyline"><code>sandra21@iitk.ac.in</code><button class="copy" type="button" data-copy="sandra21@iitk.ac.in">Copy</button></div>
+            </div>
+            <div class="item">
+              <span class="eyebrow">Office</span>
+              <span>Northern Lab II, Room 107<br>Dept. of Chemical Engineering<br>IIT Kanpur, Kanpur 208016, India</span>
+            </div>
+            <div class="item">
+              <span class="eyebrow">Profiles</span>
+              <a href="https://www.linkedin.com/in/sandra-liz-simon/" rel="noopener">LinkedIn ↗</a>
+              <a href="https://github.com/sandralizsimon" rel="noopener">GitHub ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Sandra Liz Simon · Department of Chemical Engineering, IIT Kanpur</span>
+    <nav aria-label="Profiles"><a href="https://www.linkedin.com/in/sandra-liz-simon/" rel="noopener">LinkedIn</a><a href="https://github.com/sandralizsimon" rel="noopener">GitHub</a><a href="#top">Back to top ↑</a></nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  document.querySelectorAll(".copy").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var text = b.getAttribute("data-copy");
+      var done = function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1600); };
+      var fallback = function () { var r = document.createRange(); r.selectNodeContents(b.previousElementSibling); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected"; };
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+    });
+  });
+
+  // Müller–Brown potential and gradient
+  var A = [-200, -100, -170, 15], a = [-1, -1, -6.5, 0.7], bb = [0, 0, 11, 0.6], c = [-10, -10, -6.5, 0.7], X0 = [1, 0, -0.5, -1], Y0 = [0, 0.5, 1.5, 1];
+  function V(x, y) { var s = 0; for (var k = 0; k < 4; k++) { var dx = x - X0[k], dy = y - Y0[k]; s += A[k] * Math.exp(a[k]*dx*dx + bb[k]*dx*dy + c[k]*dy*dy); } return s; }
+  function G(x, y) { var gx = 0, gy = 0; for (var k = 0; k < 4; k++) { var dx = x - X0[k], dy = y - Y0[k], t = A[k] * Math.exp(a[k]*dx*dx + bb[k]*dx*dy + c[k]*dy*dy); gx += t * (2*a[k]*dx + bb[k]*dy); gy += t * (bb[k]*dx + 2*c[k]*dy); } return [gx, gy]; }
+
+  // NEB with improved tangent and climbing image
+  var mA = [-0.5582, 1.4417], mB = [0.6235, 0.0280], N = 17, imgs, iter;
+  var SD_DT = 0.0002, CI_START = 0;
+  function reset() {
+    imgs = []; iter = 0;
+    for (var i = 0; i < N; i++) { var t = i / (N-1); imgs.push([mA[0] + t*(mB[0]-mA[0]), mA[1] + t*(mB[1]-mA[1])]); }
+  }
+  function step() {
+    var E = imgs.map(function (p) { return V(p[0], p[1]); }), imax = 1;
+    for (var i = 2; i < N-1; i++) if (E[i] > E[imax]) imax = i;
+    var F = [];
+    for (i = 1; i < N-1; i++) {
+      var p = imgs[i], pn = imgs[i+1], pp = imgs[i-1], tp = [pn[0]-p[0], pn[1]-p[1]], tm = [p[0]-pp[0], p[1]-pp[1]], tau;
+      if (E[i+1] > E[i] && E[i] > E[i-1]) tau = tp; else if (E[i+1] < E[i] && E[i] < E[i-1]) tau = tm;
+      else { var d1 = Math.abs(E[i+1]-E[i]), d2 = Math.abs(E[i-1]-E[i]), mx = Math.max(d1, d2), mn = Math.min(d1, d2);
+        tau = E[i+1] > E[i-1] ? [tp[0]*mx + tm[0]*mn, tp[1]*mx + tm[1]*mn] : [tp[0]*mn + tm[0]*mx, tp[1]*mn + tm[1]*mx]; }
+      var n = Math.hypot(tau[0], tau[1]) || 1; tau = [tau[0]/n, tau[1]/n];
+      var g = G(p[0], p[1]), gt = g[0]*tau[0] + g[1]*tau[1], f;
+      if (i === imax && iter > CI_START) f = [-g[0] + 2*gt*tau[0], -g[1] + 2*gt*tau[1]];
+      else { var k = 120, fs = k * (Math.hypot(tp[0], tp[1]) - Math.hypot(tm[0], tm[1]));
+        f = [-(g[0] - gt*tau[0]) + fs*tau[0], -(g[1] - gt*tau[1]) + fs*tau[1]]; }
+      F.push(f);
+    }
+    // overdamped steepest descent: dt * (largest curvature on the path) < 1, so no image overshoots the valley floor
+    for (i = 1; i < N-1; i++) { imgs[i][0] += SD_DT*F[i-1][0]; imgs[i][1] += SD_DT*F[i-1][1]; }
+    iter++;
+  }
+
+  var cv = document.getElementById("neb"), ctx = cv.getContext("2d"), field = null, W = 0, H = 0, dpr = 1, map;
+  var XR = [-1.6, 1.2], YR = [-0.4, 2.0];
+  function layout() {
+    var r = cv.getBoundingClientRect(); dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(1, Math.round(r.width * dpr)); H = Math.max(1, Math.round(r.height * dpr)); cv.width = W; cv.height = H;
+    var wide = r.width > 760, boxW = wide ? W * 0.62 : W, boxH = H;
+    var sc = Math.min(boxW / (XR[1]-XR[0]), boxH / (YR[1]-YR[0])) * (wide ? 1.0 : 1.05);
+    var ox = wide ? W - boxW + (boxW - sc*(XR[1]-XR[0]))/2 : (W - sc*(XR[1]-XR[0]))/2, oy = (H - sc*(YR[1]-YR[0]))/2;
+    map = function (p) { return [ox + (p[0]-XR[0])*sc, oy + (YR[1]-p[1])*sc]; };
+    // contour field, drawn once per resize
+    field = document.createElement("canvas"); field.width = W; field.height = H;
+    var fx = field.getContext("2d"), st = Math.max(2, Math.round(2*dpr)), cols = Math.ceil(W/st), rows = Math.ceil(H/st), lv = new Int16Array(cols*rows);
+    for (var j = 0; j < rows; j++) for (var i = 0; i < cols; i++) {
+      var x = XR[0] + (i*st - ox)/sc, y = YR[1] - (j*st - oy)/sc, v = Math.min(V(x, y), 120), t = (v + 147) / 267;
+      lv[j*cols + i] = Math.floor(Math.sqrt(Math.max(t, 0)) * 18);
+    }
+    for (j = 0; j < rows-1; j++) for (i = 0; i < cols-1; i++) {
+      var q = lv[j*cols + i];
+      if (q !== lv[j*cols + i + 1] || q !== lv[(j+1)*cols + i]) { var al = 0.5 - q * 0.022; if (al > 0.04) { fx.fillStyle = "rgba(140,215,255," + al.toFixed(3) + ")"; fx.fillRect(i*st, j*st, st, st); } }
+    }
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H); if (field) ctx.drawImage(field, 0, 0);
+    var imax = ciIndex;
+    var qa = map(mA), qb = map(mB);
+    ctx.font = (12*dpr) + "px 'JetBrains Mono', monospace"; ctx.fillStyle = "#b9d8ff"; ctx.fillText("A", qa[0] - 18*dpr, qa[1] - 8*dpr); ctx.fillText("B", qb[0] + 12*dpr, qb[1] + 4*dpr);
+    ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = "rgba(185,216,255,0.55)"; ctx.beginPath();
+    imgs.forEach(function (p, k) { var q = map(p); k ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.stroke();
+    imgs.forEach(function (p, k) {
+      var q = map(p), r = (k === 0 || k === N-1 ? 6 : 4.5) * dpr; ctx.beginPath(); ctx.arc(q[0], q[1], r, 0, 7);
+      if (k === imax) { ctx.fillStyle = "#ff9cc7"; ctx.shadowColor = "#ff9cc7"; ctx.shadowBlur = 16 * dpr; }
+      else { ctx.fillStyle = "#b9d8ff"; ctx.shadowColor = "#b9d8ff"; ctx.shadowBlur = 8 * dpr; }
+      ctx.fill(); ctx.shadowBlur = 0;
+    });
+    var qt = map(imgs[imax]);
+    if (phase === "done") { ctx.globalAlpha = Math.min(1, doneT / 500); ctx.fillStyle = "#ff9cc7"; ctx.fillText("TS", qt[0] + 10*dpr, qt[1] - 10*dpr); ctx.globalAlpha = 1; }
+    var stage = phase === "guess" ? "Initial guess: linear interpolation A → B" : phase === "relax" ? "Relaxing · iteration " + shownIter : "Converged: minimum energy path + climbing-image TS";
+    var sp = map([XR[0] + 0.05, YR[0] + 0.06]); ctx.fillStyle = "rgba(195,208,236,0.85)"; ctx.fillText(stage, Math.max(sp[0], W - 440*dpr), H - 16*dpr);
+  }
+
+  // Run the real CI-NEB/FIRE optimization once, record every iteration, then play it back smoothly.
+  var NIT = 4000, traj = [], cumd = [0], ciIndex = 1, phase = "guess", shownIter = 0, doneT = 0;
+  function snap() { return imgs.map(function (p) { return [p[0], p[1]]; }); }
+  (function record() {
+    reset(); traj.push(snap());
+    for (var k = 0; k < NIT; k++) { step(); traj.push(snap()); }
+    for (k = 1; k < traj.length; k++) { var d = 0; for (var i = 0; i < N; i++) { var dx = traj[k][i][0] - traj[k-1][i][0], dy = traj[k][i][1] - traj[k-1][i][1]; d += dx*dx + dy*dy; } cumd.push(cumd[k-1] + Math.sqrt(d)); }
+    var tot = cumd[cumd.length-1] || 1; for (k = 0; k < cumd.length; k++) cumd[k] /= tot;
+    var last = traj[traj.length-1]; for (i = 2; i < N-1; i++) if (V(last[i][0], last[i][1]) > V(last[ciIndex][0], last[ciIndex][1])) ciIndex = i;
+  })();
+  function pose(u) {
+    var lo = 0, hi = cumd.length - 1;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (cumd[mid] <= u) lo = mid; else hi = mid; }
+    var f = (u - cumd[lo]) / ((cumd[hi] - cumd[lo]) || 1); f = Math.max(0, Math.min(1, f));
+    shownIter = f < 0.5 ? lo : hi;
+    return traj[lo].map(function (p, i) { var q = traj[hi][i]; return [p[0] + f*(q[0]-p[0]), p[1] + f*(q[1]-p[1])]; });
+  }
+  function ease(u) { return u < 0.5 ? 4*u*u*u : 1 - Math.pow(-2*u + 2, 3) / 2; }
+  var T_GUESS = 1600, T_RELAX = 6500, T_HOLD = 3500, clock = 0, last = null;
+  function setFrame(t) {
+    if (t < T_GUESS) { phase = "guess"; imgs = traj[0]; shownIter = 0; }
+    else if (t < T_GUESS + T_RELAX) { phase = "relax"; imgs = pose(ease((t - T_GUESS) / T_RELAX)); }
+    else { phase = "done"; doneT = t - T_GUESS - T_RELAX; imgs = traj[traj.length-1]; shownIter = NIT; }
+  }
+
+  var reduce = false; try { reduce = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+  var paused = reduce, btn = document.getElementById("motion");
+  function setPaused(p) { paused = p; last = null; btn.textContent = p ? "Play animation" : "Pause animation"; btn.setAttribute("aria-pressed", String(p)); if (!p) requestAnimationFrame(tick); }
+  function tick(now) {
+    if (paused) return;
+    if (last !== null) clock += Math.min(now - last, 50);
+    last = now;
+    if (clock > T_GUESS + T_RELAX + T_HOLD) clock = 0;
+    setFrame(clock); draw(); requestAnimationFrame(tick);
+  }
+  btn.addEventListener("click", function () { setPaused(!paused); });
+  try { layout(); } catch (e) {}
+  if (reduce) { setFrame(T_GUESS + T_RELAX + 1000); draw(); setPaused(true); } else { setFrame(0); draw(); setPaused(false); }
+  var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { layout(); draw(); }, 150); });
+  document.addEventListener("visibilitychange", function () { last = null; if (!document.hidden && !paused) requestAnimationFrame(tick); });
+})();
+</script>
+
+</body>
+</html>
