@@ -91,8 +91,6 @@ p { margin: 0; }
 .hero-caption { margin-top: clamp(3rem, 8vw, 5rem); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;
   border-top: 1px solid var(--line); padding-top: 1.1rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
 .hero-caption .live { border-left: 1px solid var(--cyan); padding-left: 0.8rem; }
-#motion { background: transparent; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); font: inherit; letter-spacing: 0.08em; padding: 0.45rem 0.8rem; cursor: pointer; }
-#motion:hover { color: var(--mint); border-color: var(--mint); }
 @media (max-width: 760px) { .hero::before { background: rgba(5,11,31,0.72); } }
 
 /* highlight strip */
@@ -252,7 +250,6 @@ footer a { color: var(--muted); text-decoration: none; font-weight: 600; }
       <div class="hero-caption">
         <span class="live">Live · nudged elastic band, from linear guess to MEP, on the Müller–Brown surface</span>
         <span>IIT Kanpur, India · 26.51° N · 80.23° E</span>
-        <button id="motion" type="button" aria-pressed="false">Pause animation</button>
       </div>
     </div>
   </section>
@@ -590,20 +587,27 @@ footer a { color: var(--muted); text-decoration: none; font-weight: 600; }
   }
 
   var reduce = false; try { reduce = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
-  var paused = reduce, btn = document.getElementById("motion");
-  function setPaused(p) { paused = p; last = null; btn.textContent = p ? "Play animation" : "Pause animation"; btn.setAttribute("aria-pressed", String(p)); if (!p) requestAnimationFrame(tick); }
+  // Loops on its own (replaying after each hold); hovering the hero replays it straight away.
+  // With reduced motion it rests on the converged path and plays one run per hover.
+  var running = false;
+  function play() { if (!running) { running = true; last = null; requestAnimationFrame(tick); } }
   function tick(now) {
-    if (paused) return;
+    if (document.hidden) { running = false; return; }
     if (last !== null) clock += Math.min(now - last, 50);
     last = now;
-    if (clock > T_GUESS + T_RELAX + T_HOLD) clock = 0;
+    if (clock > T_GUESS + T_RELAX + T_HOLD) {
+      if (reduce) { clock = T_GUESS + T_RELAX + 1000; setFrame(clock); draw(); running = false; return; }
+      clock = 0;
+    }
     setFrame(clock); draw(); requestAnimationFrame(tick);
   }
-  btn.addEventListener("click", function () { setPaused(!paused); });
+  document.querySelector(".hero").addEventListener("pointerenter", function () {
+    if (phase === "done") { clock = 0; play(); }
+  });
   try { layout(); } catch (e) {}
-  if (reduce) { setFrame(T_GUESS + T_RELAX + 1000); draw(); setPaused(true); } else { setFrame(0); draw(); setPaused(false); }
+  if (reduce) { setFrame(T_GUESS + T_RELAX + 1000); draw(); } else { setFrame(0); draw(); play(); }
   var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { layout(); draw(); }, 150); });
-  document.addEventListener("visibilitychange", function () { last = null; if (!document.hidden && !paused) requestAnimationFrame(tick); });
+  document.addEventListener("visibilitychange", function () { last = null; if (!document.hidden && (!reduce || phase !== "done")) play(); });
 })();
 </script>
 
