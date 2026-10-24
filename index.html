@@ -579,7 +579,7 @@ footer a { color: var(--muted); text-decoration: none; font-weight: 600; }
     return traj[lo].map(function (p, i) { var q = traj[hi][i]; return [p[0] + f*(q[0]-p[0]), p[1] + f*(q[1]-p[1])]; });
   }
   function ease(u) { return u < 0.5 ? 4*u*u*u : 1 - Math.pow(-2*u + 2, 3) / 2; }
-  var T_GUESS = 1600, T_RELAX = 6500, T_HOLD = 3500, clock = 0, last = null;
+  var T_GUESS = 1000, T_RELAX = 6500, T_HOLD = 3500, clock = 0, last = null;
   function setFrame(t) {
     if (t < T_GUESS) { phase = "guess"; imgs = traj[0]; shownIter = 0; }
     else if (t < T_GUESS + T_RELAX) { phase = "relax"; imgs = pose(ease((t - T_GUESS) / T_RELAX)); }
